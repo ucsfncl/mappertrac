@@ -134,7 +134,7 @@ def main():
     for input_dir in session_dirs:
         subject = basename(dirname(input_dir))
         session = basename(input_dir)
-        subject_dir = join(output_dir, 'derivatives', subject, session)
+        subject_dir = join(output_dir, subject, session)
         param = base_params.copy()
         param.update({
             'input_dir': input_dir,
@@ -161,7 +161,7 @@ def main():
         mem_per_worker = 0.1
         for params in all_params:
             work_dir = params['work_dir']
-            bedpostxResults = join(work_dir,"bedpostx_b1000.bedpostX")
+            bedpostxResults = join(work_dir,"bedpostx.bedpostX")
             subject_size = 0
             for dirpath, dirnames, filenames in os.walk(bedpostxResults):
                 for f in filenames:

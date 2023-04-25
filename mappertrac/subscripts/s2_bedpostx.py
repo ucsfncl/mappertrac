@@ -28,8 +28,8 @@ Arguments:
     write(stdout, start_str)
     print(start_str)
 
-    bedpostx = join(sdir,'bedpostx_b1000')
-    bedpostxResults = join(sdir,'bedpostx_b1000.bedpostX')
+    bedpostx = join(sdir,'bedpostx')
+    bedpostxResults = join(sdir,'bedpostx.bedpostX')
     th1 = join(bedpostxResults, 'merged_th1samples')
     ph1 = join(bedpostxResults, 'merged_ph1samples')
     th2 = join(bedpostxResults, 'merged_th2samples')
@@ -41,8 +41,8 @@ Arguments:
     smart_remove(bedpostxResults)
     smart_mkdir(bedpostx)
     smart_mkdir(bedpostxResults)
-    smart_copy(join(sdir, 'data_eddy.nii.gz'), join(bedpostx, 'data.nii.gz'))
-    smart_copy(join(sdir, 'data_bet_mask.nii.gz'), join(bedpostx, 'nodif_brain_mask.nii.gz'))
+    smart_copy(join(sdir, f'{ID}_*_eddy.nii.gz'), join(bedpostx, 'data.nii.gz'))
+    smart_copy(join(sdir, f'{ID}_*_nodif_thr_brain_mask.nii.gz'), join(bedpostx, 'nodif_brain_mask.nii.gz'))
 
     if exists(join(sdir, 'bvals_reorg')):
         smart_copy(join(sdir, 'bvals_reorg'), join(bedpostx, 'bvals'))
@@ -60,7 +60,7 @@ Arguments:
     smart_remove(bedpostx_sh)
     write(bedpostx_sh, 'export CUDA_LIB_DIR=$CUDA_10_2_LIB_DIR\n' +
                        'export LD_LIBRARY_PATH=$CUDA_10_2_DIR:$LD_LIBRARY_PATH\n' +
-                       'bedpostx_gpu /mappertrac/bedpostx_b1000 -NJOBS 4')
+                       'bedpostx_gpu /mappertrac/bedpostx -NJOBS 4')
     gpu_params = params.copy()
     gpu_params['use_gpu'] = True
     run('sh ' + bedpostx_sh, gpu_params)

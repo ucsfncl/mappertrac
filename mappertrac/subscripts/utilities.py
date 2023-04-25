@@ -59,11 +59,11 @@ def run(command, params=None, ignore_errors=False, print_output=True, print_time
     containers = params['containers'] if (params and 'containers' in params) else None
 
     containers_dir = abspath(containers) if containers is not None else None
-    fsl_container = join(containers_dir,'fsl-v6.0.6.4.sif') if containers is not None else None 
+    fsl_container = join(containers_dir,'mappertrac.sif') if containers is not None else None 
     fs_container = join(containers_dir,'freesurfer-v7.3.2.sif') if containers is not None else None
     mrtrix3_container = join(containers_dir,'mrtrix3-v3.0.3.sif') if containers is not None else None
-    fsl_commands = ['fsl', 'flirt', 'convert_xfm', 'topup', 'eddy', 'bet', 'dtifit', 'bedpostx', 'make_dyadic_vectors', 'probtrackx2', 'find_the_biggest', 'find', 'sh', 'cat']
-    fs_commands = ['recon-all', 'mri_convert', 'mri_annotation2label', 'mri_label2vol']
+    fsl_commands = ['fsl', 'flirt', 'convert_xfm', 'topup', 'eddy', 'eddy_cuda10.2', 'bet', 'dtifit', 'bedpostx', 'make_dyadic_vectors', 'probtrackx2', 'find_the_biggest', 'find', 'sh', 'cat']
+    fs_commands = ['recon-all', 'mri_synthstrip', 'mri_convert', 'mri_annotation2label', 'mri_label2vol']
     mrtrix3_commands = ['5ttgen', 'mrconvert', 'dwibiascorrect', 'dwi2response', 'dwi2mask', 'mtnormalise', 'dwi2fod', 'tckgen', 'tckmap', 'labelconvert', 'tck2connectome']
     # When using a container, change all paths to be relative to its mounted directory (hideous, but works without changing other code)
     if (container is not None) or (containers is not None):
@@ -82,8 +82,8 @@ def run(command, params=None, ignore_errors=False, print_output=True, print_time
         command = (f'singularity exec {"--nv" if use_gpu else ""} ' +
             f'--cleanenv ' +
             f'--home /fake_home_dir ' +
-            # f'-B /opt/sge ' +
-            # f'-B /wynton/home/mukherjee/shared/mappertrac/license.txt:/opt/freesurfer/license.txt ' + # we should be able to replace this hard-coded host path for license to a param
+            f'-B /opt/sge ' +
+            f'-B /wynton/home/mukherjee/shared/mappertrac/license.txt:/opt/freesurfer/license.txt ' + # we should be able to replace this hard-coded host path for license to a param
             f'-B {work_dir}:/mappertrac {container_run} ' +
             f'sh -c "{command}"')
         print(command)
