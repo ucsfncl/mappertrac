@@ -28,7 +28,7 @@ Arguments:
     print(start_str)
 
     if isfile(join(sdir, f'{ID}_*_dwi_eddy.nii.gz')):
-        work_dwi = join(sdir, f'{ID}_*_dwi_eddy.nii.gz');
+        work_dwi = join(sdir, f'{ID}_*_dwi_eddy.nii.gz')
     if isfile(join(sdir, 'bvals')):
         work_bval = join(sdir, 'bvals')
     if isfile(join(sdir, 'bvecs')):
@@ -76,14 +76,19 @@ Arguments:
         rawdata_dir = sdir.replace('/derivatives/', '/rawdata/')
         smart_copy(input_dir, rawdata_dir)
     else:
-        write(stdout, f'All input files already exist in the work_dir. Proceed to preprocessing.'
+        write(stdout, f'All input files already exist in the work_dir. Proceed to preprocessing.')
         
 
     ##################################
     # dti-preproc
     ##################################
-    
-    if not exists(join(sdir, f'{ID}_*_dwi_eddy.nii.gz')):
+
+    if exists(join(sdir, f'{ID}_*_dwi_eddy.nii.gz')): 
+        write(stdout, "Work dwi was eddy output to begin with.")
+        bet_mask = join(sdir, f'{ID}_*_nodif_thr_brain_mask.nii.gz')
+        if not exists(bed_mask):
+            write(stdout, "Missing the brain mask file!")
+    else:
         # Identify b0 volumes in work_dwi
         bval_txt = open(work_bval, 'r')
         bval_list = bval_txt.read().split()
@@ -195,11 +200,6 @@ Arguments:
                 run(f'flirt -in {_} -ref {eddy_prefix}_ref -nosearch -interp trilinear -o {_} -paddingsize 1', params)
             run(f'fslmerge -t {data_eddy} {" ".join(timeslices)}', params)
             run(f'bet {data_eddy} {bet} -m -f 0.3', params)
-    else:
-        write(stdout, "Work dwi was eddy output to begin with.")
-        bet_mask = join(sdir, f'{ID}_*_nodif_thr_brain_mask.nii.gz')
-        if not exists(bed_mask):
-            write(stdout, "Missing the brain mask file!")
 
     FA = join(sdir, f'{ID}_*_FA.nii.gz')
     if exists(FA):
