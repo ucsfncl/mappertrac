@@ -238,12 +238,16 @@ Arguments:
     run(f'mri_convert {work_T1} {mri_out}', params)
 
     EDI = join(sdir, 'EDI')
+    mri_aseg = join(sdir, 'mri', 'aseg.mgz')
 
     if exists(EDI):
         write(stdout, f'Detected EDI folder. Skipping recon-all.')
     else:
-        write(stdout, f'Running Freesurfer with {ncores} cores')
-        run(f'recon-all -s . -all -notal-check -no-isrunning -cw256 -parallel -openmp {ncores}', params)
+        if exists(mri_aseg):
+            write(stdout, f'Found aseg mgz. Skipping recon-all.')
+        else:
+            write(stdout, f'Running Freesurfer with {ncores} cores')
+            run(f'recon-all -s . -all -notal-check -no-isrunning -cw256 -parallel -openmp {ncores}', params)
 
     ########################
     # mri_annotation2label #
