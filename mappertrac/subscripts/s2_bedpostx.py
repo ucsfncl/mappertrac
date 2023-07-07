@@ -28,8 +28,16 @@ Arguments:
     write(stdout, start_str)
     print(start_str)
 
-    bedpostx = join(sdir,'bedpostx')
-    bedpostxResults = join(sdir,'bedpostx.bedpostX')
+    if exists(join(dirname(sdir), 'work_dir.bedpostX')):
+        write(stdout, "BedpostX result folder found in parallel with work_dir.")
+        bedpostx = sdir
+        bedpostxResults = join(dirname(sdir), 'work_dir.bedpostX')
+        skip_bedpostx = True
+    else:
+        bedpostx = join(sdir,'bedpostx')
+        bedpostxResults = join(sdir,'bedpostx.bedpostX')
+        skip_bedpostx = False
+
     th1 = join(bedpostxResults, 'merged_th1samples')
     ph1 = join(bedpostxResults, 'merged_ph1samples')
     th2 = join(bedpostxResults, 'merged_th2samples')
@@ -37,39 +45,43 @@ Arguments:
     dyads1 = join(bedpostxResults, 'dyads1')
     dyads2 = join(bedpostxResults, 'dyads2')
     brain_mask = join(bedpostxResults, 'nodif_brain_mask')
-    smart_remove(bedpostx)
-    smart_remove(bedpostxResults)
-    smart_mkdir(bedpostx)
-    smart_mkdir(bedpostxResults)
-    smart_copy(join(sdir, f'{ID}_*_eddy.nii.gz'), join(bedpostx, 'data.nii.gz'))
-    smart_copy(join(sdir, f'{ID}_*_nodif_thr_brain_mask.nii.gz'), join(bedpostx, 'nodif_brain_mask.nii.gz'))
 
-    if exists(join(sdir, 'bvals_reorg')):
-        smart_copy(join(sdir, 'bvals_reorg'), join(bedpostx, 'bvals'))
+    if skip_bedpostx: 
+        write(stdout, "Skip_bedpostx flag is set True.")
     else:
-        smart_copy(join(sdir, 'bvals'), join(bedpostx, 'bvals'))
+        smart_remove(bedpostx)
+        smart_remove(bedpostxResults)
+        smart_mkdir(bedpostx)
+        smart_mkdir(bedpostxResults)
+        smart_copy(join(sdir, f'{ID}_*_eddy.nii.gz'), join(bedpostx, 'data.nii.gz'))
+        smart_copy(join(sdir, f'{ID}_*_nodif_thr_brain_mask.nii.gz'), join(bedpostx, 'nodif_brain_mask.nii.gz'))
 
-    if exists(join(sdir, 'eddy_rotated_bvecs')):
-        smart_copy(join(sdir, 'eddy_rotated_bvecs'), join(bedpostx, 'bvecs'))
-    elif exists(join(sdir, 'bvecs_reorg')):
-        smart_copy(join(sdir, 'bvecs_reorg'), join(bedpostx, 'bvecs'))
-    else:
-        smart_copy(join(sdir, 'bvecs'), join(bedpostx, 'bvecs'))
+        if exists(join(sdir, 'bvals_reorg')):
+            smart_copy(join(sdir, 'bvals_reorg'), join(bedpostx, 'bvals'))
+        else:
+            smart_copy(join(sdir, 'bvals'), join(bedpostx, 'bvals'))
 
-    bedpostx_sh = join(sdir, 'bedpostx.sh')
-    smart_remove(bedpostx_sh)
-    write(bedpostx_sh, 'export CUDA_LIB_DIR=$CUDA_10_2_LIB_DIR\n' +
-                       'export LD_LIBRARY_PATH=$CUDA_10_2_DIR:$LD_LIBRARY_PATH\n' +
-                       'bedpostx_gpu /mappertrac/bedpostx -NJOBS 4')
-    gpu_params = params.copy()
-    gpu_params['use_gpu'] = True
-    run('sh ' + bedpostx_sh, gpu_params)
+        if exists(join(sdir, 'eddy_rotated_bvecs')):
+            smart_copy(join(sdir, 'eddy_rotated_bvecs'), join(bedpostx, 'bvecs'))
+        elif exists(join(sdir, 'bvecs_reorg')):
+            smart_copy(join(sdir, 'bvecs_reorg'), join(bedpostx, 'bvecs'))
+        else:
+            smart_copy(join(sdir, 'bvecs'), join(bedpostx, 'bvecs'))
+
+        bedpostx_sh = join(sdir, 'bedpostx.sh')
+        smart_remove(bedpostx_sh)
+        write(bedpostx_sh, 'export CUDA_LIB_DIR=$CUDA_10_2_LIB_DIR\n' +
+                           'export LD_LIBRARY_PATH=$CUDA_10_2_DIR:$LD_LIBRARY_PATH\n' +
+                           'bedpostx_gpu /mappertrac/bedpostx -NJOBS 4')
+        gpu_params = params.copy()
+        gpu_params['use_gpu'] = True
+        run('sh ' + bedpostx_sh, gpu_params)
     
-    # hacky validation step
-    with open(stdout) as f:
-        log_content = f.read()
-        for i in range(1, 5):
-            assert('{:d} parts processed out of 4'.format(i) in log_content)
+        # hacky validation step
+        with open(stdout) as f:
+            log_content = f.read()
+            for i in range(1, 5):
+                assert('{:d} parts processed out of 4'.format(i) in log_content)
 
     run(f'make_dyadic_vectors {th1} {ph1} {brain_mask} {dyads1}', params)
     run(f'make_dyadic_vectors {th2} {ph2} {brain_mask} {dyads2}', params)
