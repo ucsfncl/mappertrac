@@ -29,6 +29,8 @@ Arguments:
 
     if isfile(join(sdir, f'{ID}_*_dwi_eddy.nii.gz')):
         work_dwi = join(sdir, f'{ID}_*_dwi_eddy.nii.gz')
+    elif isfile(join(sdir, 'data.nii.gz')):
+        work_dwi = join(sdir, 'data.nii.gz')
     if isfile(join(sdir, 'bvals')):
         work_bval = join(sdir, 'bvals')
     if isfile(join(sdir, 'bvecs')):
@@ -86,7 +88,12 @@ Arguments:
     if exists(join(sdir, f'{ID}_*_dwi_eddy.nii.gz')): 
         write(stdout, "Work dwi was eddy output to begin with.")
         bet_mask = join(sdir, f'{ID}_*_nodif_thr_brain_mask.nii.gz')
-        if not exists(bed_mask):
+        if not exists(bet_mask):
+            write(stdout, "Missing the brain mask file!")
+    elif exists(join(sdir, 'data.nii.gz')):
+        write(stdout, "Work dwi was eddy output to begin with.")
+        bet_mask = join(sdir, 'nodif_brain_mask.nii.gz')
+        if not exists(bet_mask):
             write(stdout, "Missing the brain mask file!")
     else:
         # Identify b0 volumes in work_dwi
@@ -232,28 +239,25 @@ Arguments:
     #############
     # recon-all #
     #############
-
-    mri_out = join(sdir, 'mri', 'orig', '001.mgz')
-    smart_mkdir(join(sdir, 'mri', 'orig'))
-    run(f'mri_convert {work_T1} {mri_out}', params)
-
     EDI = join(sdir, 'EDI')
+    mri_brain = join(sdir, 'mri', 'brain.mgz')
     mri_aseg = join(sdir, 'mri', 'aseg.mgz')
 
     if exists(EDI):
         write(stdout, f'Detected EDI folder. Skipping recon-all.')
     else:
-        if exists(mri_aseg):
-            write(stdout, f'Found aseg mgz. Skipping recon-all.')
+        if exists(mri_brain) and exists(mri_aseg):
+            write(stdout, f'Found brain mgz and aseg mgz. Skipping recon-all.')
         else:
+            mri_out = join(sdir, 'mri', 'orig', '001.mgz')
+            smart_mkdir(join(sdir, 'mri', 'orig'))
+            run(f'mri_convert {work_T1} {mri_out}', params)
             write(stdout, f'Running Freesurfer with {ncores} cores')
             run(f'recon-all -s . -all -notal-check -no-isrunning -cw256 -parallel -openmp {ncores}', params)
 
     ########################
     # mri_annotation2label #
     ########################
-    mri_brain = join(sdir, 'mri', 'brain.mgz')
-    mri_aseg = join(sdir, 'mri', 'aseg.mgz')
     aseg = join(sdir, 'aseg.nii.gz')
     bs = join(sdir, 'bs.nii.gz')
     FA2T1 = join(sdir, 'FA2T1.mat')
