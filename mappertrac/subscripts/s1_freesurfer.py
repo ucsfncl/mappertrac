@@ -29,7 +29,7 @@ Arguments:
 
     if isfile(join(sdir, f'{ID}_*_dwi_eddy.nii.gz')):
         work_dwi = join(sdir, f'{ID}_*_dwi_eddy.nii.gz')
-    elif isfile(join(sdir, 'data.nii.gz')):
+    if not exists(work_dwi):
         work_dwi = join(sdir, 'data.nii.gz')
     if isfile(join(sdir, 'bvals')):
         work_bval = join(sdir, 'bvals')
@@ -37,6 +37,9 @@ Arguments:
         work_bvec = join(sdir, 'bvecs')
     if isfile(join(sdir, f'{ID}_*_T1w.nii.gz')):
         work_T1 = join(sdir, f'{ID}_*_T1w.nii.gz')
+    if not exists(work_T1):
+        work_T1 = join(sdir, f'{ID}_*_T1wGd.nii.gz')
+
     all_inputs_exist = True    
     for file in [work_dwi, work_bval, work_bvec, work_T1]:
         if not exists(file):
@@ -242,6 +245,8 @@ Arguments:
     EDI = join(sdir, 'EDI')
     mri_brain = join(sdir, 'mri', 'brain.mgz')
     mri_aseg = join(sdir, 'mri', 'aseg.mgz')
+    if not exists(mri_aseg):
+        mri_aseg = join(sdir, 'mri', 'aparc+aseg.mgz')
 
     if exists(EDI):
         write(stdout, f'Detected EDI folder. Skipping recon-all.')
