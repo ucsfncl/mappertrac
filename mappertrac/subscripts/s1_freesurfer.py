@@ -323,6 +323,8 @@ Arguments:
         run(f'fslmaths {out_vol} -thr 0.2 -bin {out_vol}', params)
 
     run(f'fslmaths {FA} -mul 0 {bs}', params)  # For now we fake a bs.nii.gz file
+    work_FA = join(sdir, 'FA.nii.gz')
+    smart_copy(FA, work_FA)
     maskseeds(sdir, join(cort_vol_dir + '_s2fa'), join(cort_vol_dir + '_s2fa_m'), 0.05, 1, 1, params)
     maskseeds(sdir, join(subcort_vol_dir + '_s2fa'), join(subcort_vol_dir + '_s2fa_m'), 0.05, 0.4, 0.4, params)
     saveallvoxels(sdir, join(cort_vol_dir + '_s2fa_m'), join(subcort_vol_dir + '_s2fa_m'), allvoxelscortsubcort, params)
