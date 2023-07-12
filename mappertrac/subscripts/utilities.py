@@ -83,7 +83,7 @@ def run(command, params=None, ignore_errors=False, print_output=True, print_time
             f'--cleanenv ' +
             f'--home /fake_home_dir ' +
             f'-B /opt/sge ' +
-            f'-B /wynton/home/mukherjee/shared/mappertrac/license.txt:/opt/freesurfer/license.txt ' + # we should be able to replace this hard-coded host path for license to a param
+            f'-B /wynton/home/mukherjee/shared/mappertrac/license.txt:/usr/local/freesurfer/license.txt ' + # we should be able to replace this hard-coded host path for license to a param
             f'-B {work_dir}:/mappertrac {container_run} ' +
             f'sh -c "{command}"')
         print(command)
