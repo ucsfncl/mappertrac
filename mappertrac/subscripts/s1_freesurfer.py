@@ -35,10 +35,12 @@ Arguments:
         work_bval = join(sdir, 'bvals')
     if isfile(join(sdir, 'bvecs')):
         work_bvec = join(sdir, 'bvecs')
-    if isfile(join(sdir, f'{ID}_*_T1w.nii.gz')):
-        work_T1 = join(sdir, f'{ID}_*_T1w.nii.gz')
-    elif isfile(join(sdir, f'{ID}_*_T1wGd.nii.gz')):
-        work_T1 = join(sdir, f'{ID}_*_T1wGd.nii.gz')
+    if isfile(join(sdir, f'{ID}_T1w.nii.gz')):
+        work_T1 = join(sdir, f'{ID}_T1w.nii.gz')
+    elif isfile(join(sdir, f'{ID}_T1wGd.nii.gz')):
+        work_T1 = join(sdir, f'{ID}_T1wGd.nii.gz')
+    elif isfile(join(sdir,f'{ID}_run-02_T1wGd.nii.gz')):
+        work_T1 = join(sdir, f'{ID}_run_02_T1wGd.nii.gz')
 
     all_inputs_exist = True    
     for file in [work_dwi, work_bval, work_bvec, work_T1]:
