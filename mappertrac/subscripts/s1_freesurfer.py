@@ -29,7 +29,7 @@ Arguments:
 
     if isfile(join(sdir, f'{ID}_*_dwi_eddy.nii.gz')):
         work_dwi = join(sdir, f'{ID}_*_dwi_eddy.nii.gz')
-    if not exists(work_dwi):
+    elif isfile(join(sdir,'data.nii.gz')):
         work_dwi = join(sdir, 'data.nii.gz')
     if isfile(join(sdir, 'bvals')):
         work_bval = join(sdir, 'bvals')
@@ -37,7 +37,7 @@ Arguments:
         work_bvec = join(sdir, 'bvecs')
     if isfile(join(sdir, f'{ID}_*_T1w.nii.gz')):
         work_T1 = join(sdir, f'{ID}_*_T1w.nii.gz')
-    if not exists(work_T1):
+    elif isfile(join(sdir, f'{ID}_*_T1wGd.nii.gz')):
         work_T1 = join(sdir, f'{ID}_*_T1wGd.nii.gz')
 
     all_inputs_exist = True    
