@@ -213,7 +213,7 @@ Arguments:
             run(f'fslmerge -t {data_eddy} {" ".join(timeslices)}', params)
             run(f'bet {data_eddy} {bet} -m -f 0.3', params)
 
-    FA = join(sdir, f'{ID}_*_FA.nii.gz')
+    FA = join(sdir, f'{ID}_space-orig_model-DTI_FA.nii.gz')
     if exists(FA):
         write(stdout, "DTI parameter FA map already exists. Skipping DTI fit. ")
     else:
