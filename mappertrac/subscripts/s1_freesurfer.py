@@ -296,8 +296,8 @@ Arguments:
     run(f'mri_convert {mri_aseg} {aseg}', params)
     run(f'flirt -in {FA} -ref {work_T1} -omat {FA2T1}', params)
     run(f'convert_xfm -omat {T12FA} -inverse {FA2T1}', params)
-    run(f'mri_annotation2label --subject . --hemi rh --annotation aparc --outdir {cort_label_dir}', params)
-    run(f'mri_annotation2label --subject . --hemi lh --annotation aparc --outdir {cort_label_dir}', params)
+    run(f'mri_annotation2label --subject . --hemi rh --annotation aparc.DKTatlas --outdir {cort_label_dir}', params)
+    run(f'mri_annotation2label --subject . --hemi lh --annotation aparc.DKTatlas --outdir {cort_label_dir}', params)
 
     for label in glob(join(cort_label_dir, '*.label')):
         vol_file = join(cort_vol_dir, splitext(split(label)[1])[0] + '.nii.gz')
@@ -343,7 +343,7 @@ Arguments:
     for file in glob(join(sdir, 'volumes_subcortical_s2fa','*.nii.gz')):
         shutil.copy(file, EDI_allvols)
     validate(terminationmask, params)
-    update_permissions(sdir, params)
+    #update_permissions(sdir, params)
 
     write(join(sdir, 'S1_COMPLETE'))
     
