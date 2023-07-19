@@ -291,7 +291,8 @@ Arguments:
     smart_mkdir(subcort_vol_dir_out)
     smart_mkdir(EDI)
     smart_mkdir(EDI_allvols)
-
+    
+    # Will try multiple versions of registration	
     run(f'mri_convert {mri_brain} {work_T1} ', params)
     run(f'mri_convert {mri_aseg} {aseg}', params)
     run(f'flirt -in {FA} -ref {work_T1} -omat {FA2T1}', params)
